@@ -1,30 +1,24 @@
 package com.agungfir.taskmanager.ui.task.add
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.agungfir.taskmanager.R
+import com.agungfir.taskmanager.db.DbTaskHelper
+import com.agungfir.taskmanager.model.Task
+import com.agungfir.taskmanager.util.DateUtils
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout
 
 class AddTaskFragment : DialogFragment() {
-
-    private val taskColors = arrayOf(
-        R.color.yellow,
-        R.color.teal,
-        R.color.blueSky,
-        R.color.purple_200,
-        R.color.red,
-        R.color.orange,
-        R.color.blue,
-        R.color.purple_400
-    )
 
     companion object {
         const val TAG = "AddTaskFragment"
@@ -37,8 +31,13 @@ class AddTaskFragment : DialogFragment() {
     private lateinit var typeTaskUrgent: MaterialButton
     private lateinit var typeTaskImportant: MaterialButton
     private lateinit var edtTitleTask: EditText
+    private lateinit var edtDeadlineTask: EditText
     private lateinit var textInputLayoutTitle: TextInputLayout
+    private lateinit var btnSaveTask: Button
 
+    private lateinit var dbTaskHelper: DbTaskHelper
+    private var isEdit = false
+    private var task: Task? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.FullscreenDialogTheme)
@@ -55,19 +54,17 @@ class AddTaskFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        btnClose = view.findViewById(R.id.btnClose)
-        rvTaskColors = view.findViewById(R.id.rvTaskColors)
-        typeTaskBasic = view.findViewById(R.id.typeTaskBasic)
-        typeTaskUrgent = view.findViewById(R.id.typeTaskUrgent)
-        typeTaskImportant = view.findViewById(R.id.typeTaskImportant)
-        edtTitleTask = view.findViewById(R.id.edtTitleTask)
-        textInputLayoutTitle = view.findViewById(R.id.textInputLayoutTitle)
+        initView(view)
+        setupDB()
+        onClick()
+    }
 
+    private fun onClick() {
         btnClose.setOnClickListener {
             this.dismiss()
         }
 
-        val colorTaskAdapter = ColorTaskAdapter(taskColors)
+        val colorTaskAdapter = ColorTaskAdapter(resources.getIntArray(R.array.task_colors))
         rvTaskColors.apply {
             adapter = colorTaskAdapter
         }
@@ -87,45 +84,59 @@ class AddTaskFragment : DialogFragment() {
                 selectTypes(index)
             }
         }
+
+        edtDeadlineTask.setOnClickListener {
+            DateUtils.showDataPicker(requireContext()) { _, year, month, dayOfMonth ->
+                val dateString = DateUtils.dateFormatSql(year, month, dayOfMonth)
+                edtDeadlineTask.setText(DateUtils.dateFromSqlToDateViewTask(dateString))
+
+                task?.date = dateString
+                task?.timestamp = DateUtils.dateStringToTimestamp(dateString)
+
+                Log.i("DATE", dateString)
+                Log.i("TIMESTAMP", task?.timestamp.toString())
+            }
+        }
+
+        btnSaveTask.setOnClickListener {
+            val title = edtTitleTask.text.toString()
+
+        }
+    }
+
+    private fun setupDB() {
+        dbTaskHelper = DbTaskHelper.getInstance(requireContext())
+    }
+
+    private fun initView(view: View) {
+        btnClose = view.findViewById(R.id.btnClose)
+        rvTaskColors = view.findViewById(R.id.rvTaskColors)
+        typeTaskBasic = view.findViewById(R.id.typeTaskBasic)
+        typeTaskUrgent = view.findViewById(R.id.typeTaskUrgent)
+        typeTaskImportant = view.findViewById(R.id.typeTaskImportant)
+        edtTitleTask = view.findViewById(R.id.edtTitleTask)
+        edtDeadlineTask = view.findViewById(R.id.edtDeadlineTask)
+        textInputLayoutTitle = view.findViewById(R.id.textInputLayoutTitle)
+        btnSaveTask = view.findViewById(R.id.btnSaveTask)
     }
 
     private fun showColorSelected(color: Int) {
-        textInputLayoutTitle.endIconDrawable?.setTint(
-            ContextCompat.getColor(
-                requireActivity(),
-                color
-            )
-        )
+        textInputLayoutTitle.endIconDrawable?.setTint(color)
     }
 
     private fun selectTypes(clickType: Int) {
-
         typesTask.forEachIndexed { index, materialButton ->
             materialButton.apply {
                 if (clickType == index) {
-//                    setBackgroundDrawable(
-//                        ContextCompat.getDrawable(
-//                            requireContext(),
-//                            R.drawable.bg_circle_black
-//                        )
-//                    )
                     background =
                         ContextCompat.getDrawable(requireContext(), R.drawable.bg_circle_black)
-//                    setTextColor(resources.getColor(R.color.white))
                     setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
                 } else {
-//                    setBackgroundDrawable(
-//                        ContextCompat.getDrawable(
-//                            requireContext(),
-//                            R.drawable.bg_cirlce_stroke_black
-//                        )
-//                    )
                     background =
                         ContextCompat.getDrawable(
                             requireContext(),
                             R.drawable.bg_cirlce_stroke_black
                         )
-//                    setTextColor(resources.getColor(R.color.black))
                     setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
                 }
             }

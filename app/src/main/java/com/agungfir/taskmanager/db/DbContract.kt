@@ -11,6 +11,8 @@ object DbContract {
             const val TASK_TYPE = "task_type"
             const val TASK_COLOR = "task_color"
             const val TASK_IS_COMPLETE = "task_is_complete"
+            const val TASK_CREATED_AT = "created_at"
+            const val TASK_UPDATED_AT = "updated_at"
         }
     }
 }

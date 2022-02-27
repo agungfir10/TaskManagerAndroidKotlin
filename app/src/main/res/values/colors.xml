@@ -15,4 +15,15 @@
     <color name="lightGray500">#8C8C8C</color>
     <color name="grayTag">#4D000000</color>
     <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">#B1B1B1</color>
+
+    <integer-array name="task_colors">
+        <item>@color/yellow</item>
+        <item>@color/teal</item>
+        <item>@color/blueSky</item>
+        <item>@color/purple_200</item>
+        <item>@color/red</item>
+        <item>@color/orange</item>
+        <item>@color/blue</item>
+        <item>@color/purple_400</item>
+    </integer-array>
 </resources>

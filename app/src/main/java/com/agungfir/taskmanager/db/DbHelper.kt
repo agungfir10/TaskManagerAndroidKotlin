@@ -12,7 +12,7 @@ import com.agungfir.taskmanager.db.DbContract.DbContractTask.Companion.TASK_LOCA
 import com.agungfir.taskmanager.db.DbContract.DbContractTask.Companion.TASK_TITLE
 import com.agungfir.taskmanager.db.DbContract.DbContractTask.Companion.TASK_TYPE
 
-class DbHelper(context: Context) :
+class DbHelper(context: Context?) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     companion object {
         const val DATABASE_NAME = "task_manager"
@@ -25,7 +25,8 @@ class DbHelper(context: Context) :
                 " $TASK_LOCATION TEXT," +
                 " $TASK_TYPE INTEGER," +
                 " $TASK_COLOR INTEGER," +
-                " $TASK_IS_COMPLETE INTEGER NOT NULL)"
+                " $TASK_IS_COMPLETE INTEGER NOT NULL," +
+                " created_at LONG)"
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
